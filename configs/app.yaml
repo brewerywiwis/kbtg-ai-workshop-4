@@ -1,0 +1,11 @@
+server:
+  port: 3000
+  host: "localhost"
+  
+database:
+  driver: "sqlite3"
+  path: "users.db"
+  
+logging:
+  level: "info"
+  format: "json"
