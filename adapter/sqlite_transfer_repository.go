@@ -3,6 +3,7 @@ package adapter
 import (
 	"database/sql"
 	"time"
+
 	"workshop4-backend/domain"
 	"workshop4-backend/port"
 )
@@ -57,7 +58,6 @@ func (r *SqliteTransferRepository) Create(transfer *domain.Transfer) error {
 		transfer.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		formatTimePtr(transfer.CompletedAt),
 		transfer.FailReason)
-
 	if err != nil {
 		return err
 	}
@@ -76,11 +76,11 @@ func (r *SqliteTransferRepository) GetByIdempotencyKey(key string) (*domain.Tran
 		SELECT id, from_user_id, to_user_id, amount, status, note, idempotency_key, created_at, updated_at, completed_at, fail_reason
 		FROM transfers WHERE idempotency_key = ?
 	`
-	
+
 	var transfer domain.Transfer
 	var createdAtStr, updatedAtStr string
 	var completedAtStr, note, failReason sql.NullString
-	
+
 	err := r.db.QueryRow(query, key).Scan(
 		&transfer.ID,
 		&transfer.FromUserID,
@@ -130,7 +130,7 @@ func (r *SqliteTransferRepository) GetByUserID(userID int, page, pageSize int) (
 
 	// Get total count
 	countQuery := `
-		SELECT COUNT(*) FROM transfers 
+		SELECT COUNT(*) FROM transfers
 		WHERE from_user_id = ? OR to_user_id = ?
 	`
 	var total int
@@ -142,7 +142,7 @@ func (r *SqliteTransferRepository) GetByUserID(userID int, page, pageSize int) (
 	// Get paginated results
 	query := `
 		SELECT id, from_user_id, to_user_id, amount, status, note, idempotency_key, created_at, updated_at, completed_at, fail_reason
-		FROM transfers 
+		FROM transfers
 		WHERE from_user_id = ? OR to_user_id = ?
 		ORDER BY created_at DESC
 		LIMIT ? OFFSET ?
@@ -172,7 +172,6 @@ func (r *SqliteTransferRepository) GetByUserID(userID int, page, pageSize int) (
 			&updatedAtStr,
 			&completedAtStr,
 			&failReason)
-
 		if err != nil {
 			return nil, 0, err
 		}
@@ -206,7 +205,7 @@ func (r *SqliteTransferRepository) GetByUserID(userID int, page, pageSize int) (
 
 func (r *SqliteTransferRepository) UpdateStatus(id int, status domain.TransferStatus, completedAt *string, failReason *string) error {
 	query := `
-		UPDATE transfers 
+		UPDATE transfers
 		SET status = ?, updated_at = datetime('now'), completed_at = ?, fail_reason = ?
 		WHERE id = ?
 	`

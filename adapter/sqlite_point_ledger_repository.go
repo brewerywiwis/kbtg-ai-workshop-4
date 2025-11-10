@@ -3,6 +3,7 @@ package adapter
 import (
 	"database/sql"
 	"time"
+
 	"workshop4-backend/domain"
 	"workshop4-backend/port"
 )
@@ -29,7 +30,6 @@ func (r *SqlitePointLedgerRepository) Create(entry *domain.PointLedger) error {
 		entry.Reference,
 		entry.Metadata,
 		entry.CreatedAt.Format("2006-01-02T15:04:05Z07:00"))
-
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,6 @@ func (r *SqlitePointLedgerRepository) GetByUserID(userID int) ([]domain.PointLed
 			&reference,
 			&metadata,
 			&createdAtStr)
-
 		if err != nil {
 			return nil, err
 		}
@@ -103,9 +102,9 @@ func (r *SqlitePointLedgerRepository) GetByUserID(userID int) ([]domain.PointLed
 
 func (r *SqlitePointLedgerRepository) GetUserBalance(userID int) (int, error) {
 	query := `
-		SELECT balance_after FROM point_ledger 
-		WHERE user_id = ? 
-		ORDER BY created_at DESC 
+		SELECT balance_after FROM point_ledger
+		WHERE user_id = ?
+		ORDER BY created_at DESC
 		LIMIT 1
 	`
 

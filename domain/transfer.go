@@ -14,17 +14,17 @@ const (
 )
 
 type Transfer struct {
-	ID              int            `json:"transferId,omitempty" db:"id"`
-	FromUserID      int            `json:"fromUserId" db:"from_user_id"`
-	ToUserID        int            `json:"toUserId" db:"to_user_id"`
-	Amount          int            `json:"amount" db:"amount"`
-	Status          TransferStatus `json:"status" db:"status"`
-	Note            *string        `json:"note,omitempty" db:"note"`
-	IdempotencyKey  string         `json:"idemKey" db:"idempotency_key"`
-	CreatedAt       time.Time      `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time      `json:"updatedAt" db:"updated_at"`
-	CompletedAt     *time.Time     `json:"completedAt,omitempty" db:"completed_at"`
-	FailReason      *string        `json:"failReason,omitempty" db:"fail_reason"`
+	ID             int            `json:"transferId,omitempty" db:"id"`
+	FromUserID     int            `json:"fromUserId" db:"from_user_id"`
+	ToUserID       int            `json:"toUserId" db:"to_user_id"`
+	Amount         int            `json:"amount" db:"amount"`
+	Status         TransferStatus `json:"status" db:"status"`
+	Note           *string        `json:"note,omitempty" db:"note"`
+	IdempotencyKey string         `json:"idemKey" db:"idempotency_key"`
+	CreatedAt      time.Time      `json:"createdAt" db:"created_at"`
+	UpdatedAt      time.Time      `json:"updatedAt" db:"updated_at"`
+	CompletedAt    *time.Time     `json:"completedAt,omitempty" db:"completed_at"`
+	FailReason     *string        `json:"failReason,omitempty" db:"fail_reason"`
 }
 
 type EventType string

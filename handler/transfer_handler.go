@@ -3,8 +3,9 @@ package handler
 import (
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
 	"workshop4-backend/service"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type TransferCreateRequest struct {

@@ -20,10 +20,10 @@ var (
 )
 
 type TransferService struct {
-	transferRepo    port.TransferRepository
-	ledgerRepo      port.PointLedgerRepository
-	userRepo        port.UserRepository
-	db              *sql.DB // For transaction support
+	transferRepo port.TransferRepository
+	ledgerRepo   port.PointLedgerRepository
+	userRepo     port.UserRepository
+	db           *sql.DB // For transaction support
 }
 
 func NewTransferService(
