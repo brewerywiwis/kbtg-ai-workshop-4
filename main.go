@@ -8,8 +8,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	"workshop4-backend/adapter"
+	"workshop4-backend/domain"
 	"workshop4-backend/handler"
-	"workshop4-backend/models"
 	"workshop4-backend/service"
 )
 
@@ -25,7 +25,7 @@ func initDatabase() {
 	}
 
 	// Create users table
-	createTable := `
+	createUsersTable := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT NOT NULL,
@@ -39,9 +39,81 @@ func initDatabase() {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);`
 
-	_, err = db.Exec(createTable)
+	_, err = db.Exec(createUsersTable)
 	if err != nil {
-		log.Fatal("Failed to create table:", err)
+		log.Fatal("Failed to create users table:", err)
+	}
+
+	// Create transfers table
+	createTransfersTable := `
+	CREATE TABLE IF NOT EXISTS transfers (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		from_user_id INTEGER NOT NULL,
+		to_user_id INTEGER NOT NULL,
+		amount INTEGER NOT NULL CHECK (amount > 0),
+		status TEXT NOT NULL CHECK (status IN ('pending','processing','completed','failed','cancelled','reversed')),
+		note TEXT,
+		idempotency_key TEXT NOT NULL UNIQUE,
+		created_at TEXT NOT NULL,
+		updated_at TEXT NOT NULL,
+		completed_at TEXT,
+		fail_reason TEXT,
+		FOREIGN KEY (from_user_id) REFERENCES users(id),
+		FOREIGN KEY (to_user_id) REFERENCES users(id)
+	);`
+
+	_, err = db.Exec(createTransfersTable)
+	if err != nil {
+		log.Fatal("Failed to create transfers table:", err)
+	}
+
+	// Create transfer indexes
+	transferIndexes := []string{
+		"CREATE INDEX IF NOT EXISTS idx_transfers_from ON transfers(from_user_id);",
+		"CREATE INDEX IF NOT EXISTS idx_transfers_to ON transfers(to_user_id);",
+		"CREATE INDEX IF NOT EXISTS idx_transfers_created ON transfers(created_at);",
+	}
+
+	for _, idx := range transferIndexes {
+		_, err = db.Exec(idx)
+		if err != nil {
+			log.Fatal("Failed to create transfer index:", err)
+		}
+	}
+
+	// Create point_ledger table
+	createLedgerTable := `
+	CREATE TABLE IF NOT EXISTS point_ledger (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL,
+		change INTEGER NOT NULL,
+		balance_after INTEGER NOT NULL,
+		event_type TEXT NOT NULL CHECK (event_type IN ('transfer_out','transfer_in','adjust','earn','redeem')),
+		transfer_id INTEGER,
+		reference TEXT,
+		metadata TEXT,
+		created_at TEXT NOT NULL,
+		FOREIGN KEY (user_id) REFERENCES users(id),
+		FOREIGN KEY (transfer_id) REFERENCES transfers(id)
+	);`
+
+	_, err = db.Exec(createLedgerTable)
+	if err != nil {
+		log.Fatal("Failed to create point_ledger table:", err)
+	}
+
+	// Create ledger indexes
+	ledgerIndexes := []string{
+		"CREATE INDEX IF NOT EXISTS idx_ledger_user ON point_ledger(user_id);",
+		"CREATE INDEX IF NOT EXISTS idx_ledger_transfer ON point_ledger(transfer_id);",
+		"CREATE INDEX IF NOT EXISTS idx_ledger_created ON point_ledger(created_at);",
+	}
+
+	for _, idx := range ledgerIndexes {
+		_, err = db.Exec(idx)
+		if err != nil {
+			log.Fatal("Failed to create ledger index:", err)
+		}
 	}
 
 	// Insert sample data if table is empty
@@ -58,7 +130,7 @@ func initDatabase() {
 
 // insertSampleData adds initial sample users to the database
 func insertSampleData() {
-	sampleUsers := []models.User{
+	sampleUsers := []domain.User{
 		{
 			Name:            "สมชาย ใจดี",
 			Phone:           "081-234-5678",
@@ -94,9 +166,18 @@ func main() {
 	initDatabase()
 	defer db.Close()
 
-	dbRepo := adapter.NewSqliteUserRepository(db)
-	userService := service.NewUserService(dbRepo)
+	// Initialize repositories
+	userRepo := adapter.NewSqliteUserRepository(db)
+	transferRepo := adapter.NewSqliteTransferRepository(db)
+	ledgerRepo := adapter.NewSqlitePointLedgerRepository(db)
+
+	// Initialize services
+	userService := service.NewUserService(userRepo)
+	transferService := service.NewTransferService(transferRepo, ledgerRepo, userRepo, db)
+
+	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
+	transferHandler := handler.NewTransferHandler(transferService)
 
 	app := fiber.New()
 
@@ -104,7 +185,9 @@ func main() {
 		return c.SendString("hello world")
 	})
 
+	// Register routes
 	userHandler.RegisterRoutes(app)
+	transferHandler.RegisterRoutes(app)
 
 	log.Fatal(app.Listen(":3000"))
 }

@@ -68,3 +68,17 @@ func (r *SqliteUserRepository) Delete(id int) error {
 	_, err := r.db.Exec(`DELETE FROM users WHERE id = ?`, id)
 	return err
 }
+
+func (r *SqliteUserRepository) UpdatePoints(userID int, newBalance int) error {
+	_, err := r.db.Exec(`UPDATE users SET points = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, newBalance, userID)
+	return err
+}
+
+func (r *SqliteUserRepository) GetUserBalance(userID int) (int, error) {
+	var balance int
+	err := r.db.QueryRow(`SELECT points FROM users WHERE id = ?`, userID).Scan(&balance)
+	if err != nil {
+		return 0, err
+	}
+	return balance, nil
+}
