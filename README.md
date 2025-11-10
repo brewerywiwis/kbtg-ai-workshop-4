@@ -40,22 +40,26 @@ This project follows the [Standard Go Project Layout](https://github.com/golang-
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd workshop4-backend
 ```
 
 2. Install dependencies:
+
 ```bash
 make deps
 ```
 
 3. Build the application:
+
 ```bash
 make build
 ```
 
 4. Run the server:
+
 ```bash
 make run
 ```
@@ -65,6 +69,7 @@ The server will start on `http://localhost:3000`
 ### Development
 
 For development with hot reload:
+
 ```bash
 make dev
 ```
@@ -72,6 +77,7 @@ make dev
 ## API Endpoints
 
 ### Users
+
 - `GET /users` - List all users
 - `GET /users/:id` - Get user by ID
 - `POST /users` - Create new user
@@ -79,6 +85,7 @@ make dev
 - `DELETE /users/:id` - Delete user
 
 ### Transfers
+
 - `POST /transfers` - Create point transfer
 - `GET /transfers/:id` - Get transfer details
 - `GET /users/:id/transfers` - Get user's transfer history
@@ -126,6 +133,7 @@ make help       # Show available commands
 ## Testing
 
 Run the test suite:
+
 ```bash
 make test
 ```

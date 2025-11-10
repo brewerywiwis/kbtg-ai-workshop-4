@@ -14,7 +14,7 @@ https://github.com/mikelopster/kbtg-ai-workshop-nov/blob/main/workshop-4/specs/t
 ## Key Endpoints
 
 - `POST /transfers` - Create transfer
-- `GET /transfers/{id}` - Get transfer by idempotency key  
+- `GET /transfers/{id}` - Get transfer by idempotency key
 - `GET /transfers?userId={id}` - List user transfers (paginated)
 
 ## Authentication

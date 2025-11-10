@@ -26,7 +26,7 @@ func InitDatabase() *sql.DB {
 
 	createTables()
 	insertSampleDataIfNeeded()
-	
+
 	return db
 }
 
