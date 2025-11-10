@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"strings"
+	"time"
+)
 
 type User struct {
 	ID              int       `json:"id"`
@@ -13,4 +17,18 @@ type User struct {
 	Points          int       `json:"points"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
+}
+
+// Validate validates the user data
+func (u *User) Validate() error {
+	if strings.TrimSpace(u.Name) == "" {
+		return errors.New("name is required")
+	}
+	if strings.TrimSpace(u.Email) == "" {
+		return errors.New("email is required")
+	}
+	if strings.TrimSpace(u.Phone) == "" {
+		return errors.New("phone is required")
+	}
+	return nil
 }

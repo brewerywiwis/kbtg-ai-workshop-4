@@ -17,7 +17,20 @@ build:
 
 .PHONY: test
 test:
-	$(GOTEST) -v ./...
+	$(GOTEST) -v ./internal/...
+
+.PHONY: test-unit
+test-unit:
+	$(GOTEST) -v ./internal/domain ./internal/service
+
+.PHONY: test-coverage
+test-coverage:
+	$(GOTEST) -cover ./internal/...
+
+.PHONY: test-coverage-html
+test-coverage-html:
+	$(GOTEST) -coverprofile=coverage.out ./internal/...
+	$(GOCMD) tool cover -html=coverage.out -o coverage.html
 
 .PHONY: clean
 clean:

@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type TransferStatus string
 
@@ -25,6 +28,17 @@ type Transfer struct {
 	UpdatedAt      time.Time      `json:"updatedAt" db:"updated_at"`
 	CompletedAt    *time.Time     `json:"completedAt,omitempty" db:"completed_at"`
 	FailReason     *string        `json:"failReason,omitempty" db:"fail_reason"`
+}
+
+// Validate validates the transfer data
+func (t *Transfer) Validate() error {
+	if t.FromUserID == t.ToUserID {
+		return errors.New("cannot transfer to yourself")
+	}
+	if t.Amount <= 0 {
+		return errors.New("amount must be greater than 0")
+	}
+	return nil
 }
 
 type EventType string

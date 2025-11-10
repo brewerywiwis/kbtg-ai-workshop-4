@@ -1,6 +1,10 @@
 package service
 
 import (
+	"errors"
+	"strings"
+	"time"
+
 	"workshop4-backend/internal/domain"
 	"workshop4-backend/internal/port"
 )
@@ -22,7 +26,30 @@ func (s *UserService) GetUserByID(id int) (*domain.User, error) {
 }
 
 func (s *UserService) CreateUser(user *domain.User) error {
+	// Validate user input
+	if err := s.validateUser(user); err != nil {
+		return err
+	}
+
+	// Set timestamps
+	now := time.Now()
+	user.CreatedAt = now
+	user.UpdatedAt = now
+
 	return s.repo.Create(user)
+}
+
+func (s *UserService) validateUser(user *domain.User) error {
+	if strings.TrimSpace(user.Name) == "" {
+		return errors.New("validation error: name is required")
+	}
+	if strings.TrimSpace(user.Email) == "" {
+		return errors.New("validation error: email is required")
+	}
+	if strings.TrimSpace(user.Phone) == "" {
+		return errors.New("validation error: phone is required")
+	}
+	return nil
 }
 
 func (s *UserService) UpdateUser(user *domain.User) error {

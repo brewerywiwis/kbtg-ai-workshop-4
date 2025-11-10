@@ -127,6 +127,9 @@ make tidy       # Tidy go modules
 make lint       # Run linter
 make format     # Format code
 make db-reset   # Reset database
+make test-unit  # Run unit tests only
+make test-coverage  # Run tests with coverage
+make test-coverage-html  # Generate HTML coverage report
 make help       # Show available commands
 ```
 
@@ -137,6 +140,37 @@ Run the test suite:
 ```bash
 make test
 ```
+
+Run unit tests only:
+
+```bash
+make test-unit
+```
+
+Run tests with coverage:
+
+```bash
+make test-coverage
+```
+
+Generate HTML coverage report:
+
+```bash
+make test-coverage-html
+```
+
+### Testing Strategy
+
+- **Domain Tests**: Unit tests for domain model validation logic (100% coverage)
+- **Service Tests**: Unit tests for business logic with mocked repositories
+- **Integration Tests**: Would test the full flow with real database (separate from unit tests)
+
+The unit tests focus on:
+
+- Input validation
+- Business rule enforcement
+- Error handling
+- Mock-based testing for external dependencies
 
 ## Contributing
 
